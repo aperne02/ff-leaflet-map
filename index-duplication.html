@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Map Example with Zoom and Drag</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        /* 지도 크기 설정 */
+        #map {
+            height: 100vh;  /* 화면 크기에 맞게 지도 크기 설정 */
+            width: 100%;  /* 너비를 100%로 설정 */
+        }
+        /* 이미지 스타일 */
+        #image {
+            position: absolute;  /* 이미지를 지도 위에 겹쳐서 놓기 위해 position 설정 */
+            top: 50%;  /* 이미지가 수직으로 중앙에 배치되도록 설정 */
+            left: 50%; /* 이미지가 수평으로 중앙에 배치되도록 설정 */
+            transform: translate(-50%, -50%); /* 정확하게 중앙에 오도록 위치 보정 */
+            max-width: 100%;  /* 이미지가 화면을 넘지 않도록 설정 */
+            max-height: 100%; /* 이미지가 화면을 넘지 않도록 설정 */
+            object-fit: contain;  /* 비율을 유지하며 이미지를 화면에 맞게 조정 */
+            transition: transform 0.2s ease; /* 부드럽게 확대/축소 애니메이션 추가 */
+            cursor: grab;  /* 이미지 위에 마우스를 올리면 손잡이가 나타나도록 설정 */
+        }
+        #image:active {
+            cursor: grabbing; /* 클릭하여 드래그할 때 손잡이가 변하도록 설정 */
+        }
+    </style>
+</head>
+<body>
+    <!-- 지도 컨테이너 -->
+    <div id="map"></div>
+    <!-- 이미지 오버레이 -->
+    <img id="image" src="testmodule.png" alt="Overlay Image" />
+
+    <!-- Leaflet.js 라이브러리 -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // 지도 초기화 (하지만 실제로 지도는 필요 없을 수 있음)
+        var map = L.map('map').setView([0, 0], 2);  // 아무데나 위치로 설정하고 zoom을 최소로 설정
+
+        // OpenStreetMap 타일 레이어 추가 (지도를 보이도록 하되, 이미지를 덮을 수 있도록)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            opacity: 0  // 지도는 보이지 않도록 설정
+        }).addTo(map);
+
+        // 이미지 요소와 현재 확대/축소 상태 변수
+        var image = document.getElementById("image");
+        var scale = 1;
+
+        // 마우스 휠 이벤트로 확대/축소 조정
+        image.addEventListener("wheel", function(event) {
+            event.preventDefault();  // 기본 휠 이벤트 방지
+
+            // 휠 방향에 따른 확대/축소 처리
+            if (event.deltaY < 0) {  // 휠을 위로 스크롤하면 확대
+                scale += 0.1;
+            } else {  // 휠을 아래로 스크롤하면 축소
+                scale -= 0.1;
+                if (scale < 0.1) scale = 0.1; // 최소 축소 한계
+            }
+
+            // 이미지의 transform 속성으로 확대/축소 적용
+            image.style.transform = "translate(-50%, -50%) scale(" + scale + ")";
+        });
+
+        // 드래그 기능
+        var isDragging = false; // 드래그 상태
+        var offsetX, offsetY;   // 이미지의 초기 클릭 위치
+
+        image.addEventListener("mousedown", function(event) {
+            isDragging = true;
+            offsetX = event.clientX - image.offsetLeft; // 클릭한 X좌표와 이미지의 X좌표 차이
+            offsetY = event.clientY - image.offsetTop;  // 클릭한 Y좌표와 이미지의 Y좌표 차이
+            image.style.cursor = 'grabbing';  // 드래그 중에는 손잡이 아이콘 변경
+        });
+
+        document.addEventListener("mousemove", function(event) {
+            if (isDragging) {
+                var x = event.clientX - offsetX;  // 드래그 중인 X 좌표 계산
+                var y = event.clientY - offsetY;  // 드래그 중인 Y 좌표 계산
+                image.style.left = x + "px";  // 이미지의 위치 업데이트
+                image.style.top = y + "px";   // 이미지의 위치 업데이트
+            }
+        });
+
+        document.addEventListener("mouseup", function() {
+            isDragging = false;  // 마우스를 떼면 드래그 종료
+            image.style.cursor = 'grab';  // 마우스를 떼면 다시 손잡이 아이콘으로 변경
+        });
+    </script>
+</body>
+</html>
