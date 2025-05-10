@@ -2,35 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaflet Map Example</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <style>
-        /* 지도 크기 설정 */
-        #map {
-            height: 100vh;  /* 화면 크기에 맞게 지도 크기 설정 */
-        }
-    </style>
+    <title>Test Page</title>
 </head>
 <body>
-    <!-- 지도 컨테이너 -->
-    <div id="map"></div>
-
-    <!-- Leaflet.js 라이브러리 -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        // 지도 초기화
-        var map = L.map('map').setView([51.505, -0.09], 13);  // 중심 좌표와 줌 레벨 설정
-
-        // OpenStreetMap 타일 레이어 추가
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        // 지도에 마커 추가
-        L.marker([51.5, -0.09]).addTo(map)
-            .bindPopup("A simple marker.")
-            .openPopup();
-    </script>
+    <h1>GitHub Pages 정상 작동!</h1>
+    <p>이 페이지가 보인다면 GitHub Pages가 정상적으로 설정된 것입니다.</p>
 </body>
 </html>
