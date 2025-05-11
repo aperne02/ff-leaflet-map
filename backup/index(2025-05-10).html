@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leaflet Custom Image</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // 이미지 정보
+    var imageUrl = 'testmodule.png';
+    var imageWidth = 9000;
+    var imageHeight = 4500;
+    var imageBounds = [[0, 0], [imageHeight, imageWidth]];
+
+    // 지도 생성
+    var map = L.map('map', {
+      crs: L.CRS.Simple,
+      minZoom: -2,          // 축소 가능
+      maxZoom: 4,
+      zoomControl: true,
+      maxBounds: imageBounds,
+      maxBoundsViscosity: 1.0
+    });
+
+    // 이미지 오버레이 추가
+    L.imageOverlay(imageUrl, imageBounds, {
+      noWrap: true
+    }).addTo(map);
+
+    // 전체 이미지가 화면에 보이도록 위치 설정
+    map.fitBounds(imageBounds);
+  </script>
+</body>
+</html>
