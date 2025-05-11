@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leaflet Excel Marker</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 100vh;
+    }
+    #pointToggle, #uploadExcel, #labelToggle {
+      position: absolute;
+      top: 200px; /* 위치를 더 위로 조정 */
+      left: 10px;
+      z-index: 1000;
+      background: white;
+      padding: 2px 8px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 12px;
+      line-height: 1.2;
+      margin-bottom: 5px;
+    }
+    #uploadExcel {
+      top: 300px; /* POINT 버튼 아래로 배치 */
+      font-weight: normal;
+    }
+    #labelToggle {
+      top: 250px; /* LABEL 버튼 위치 조정 */
+    }
+  </style>
+</head>
+<body>
+  <div id="pointToggle">POINT</div>
+  <input type="file" id="uploadExcel" accept=".xlsx, .xls" />
+  <div id="labelToggle">LABEL</div>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <script>
+    var imageUrl = 'testmodule.png';
+    var imageWidth = 9000;
+    var imageHeight = 4500;
+    var imageBounds = [[0, 0], [imageHeight, imageWidth]];
+
+    var map = L.map('map', {
+      crs: L.CRS.Simple,
+      minZoom: -2,
+      maxZoom: 4,
+      zoomControl: true,
+      maxBounds: imageBounds,
+      maxBoundsViscosity: 1.0
+    });
+
+    L.imageOverlay(imageUrl, imageBounds, { noWrap: true }).addTo(map);
+    map.fitBounds(imageBounds);
+
+    // 지도에 표시할 데이터와 레이어들을 저장
+    let showAsLabel = false;
+    let uploadedData = [];         // 엑셀 데이터 저장
+    let displayedLayers = [];      // 지도에 추가된 마커/텍스트 저장
+
+    // "POINT" 버튼 기능 추가 (좌표 표시 모드)
+    var pointMode = false;
+    var pointToggleButton = document.getElementById('pointToggle');
+
+    pointToggleButton.addEventListener('click', function() {
+      pointMode = !pointMode;
+      pointToggleButton.style.backgroundColor = pointMode ? '#def' : 'white';
+    });
+
+    map.on('click', function(e) {
+      if (!pointMode) return;
+
+      var coords = e.latlng;
+      var pixelX = Math.round(coords.lng);
+      var pixelY = Math.round(coords.lat);
+
+      var popup = L.popup()
+        .setLatLng(coords)
+        .setContent('X: ' + pixelX + ', Y: ' + pixelY)
+        .openOn(map);
+
+      // 팝업을 1.5초 후에 닫기
+      setTimeout(() => map.closePopup(popup), 1500);
+    });
+
+    // 엑셀 파일 업로드 후 데이터 처리
+    document.getElementById('uploadExcel').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+... (67줄 남음)
+접기
+index-duplication2.html
+6KB
+지원 whkaperne — 오후 9:08
+// POINT 모드 설정
+    var pointMode = false;
+    var pointToggleButton = document.getElementById('pointToggle');
+    var activePopups = [];
+
+    pointToggleButton.addEventListener('click', function () {
+      pointMode = !pointMode;
+      pointToggleButton.style.backgroundColor = pointMode ? '#def' : 'white';
+    });
+
+    map.on('click', function (e) {
+      if (!pointMode) return;
+
+      var pixelX = Math.round(e.latlng.lng);
+      var pixelY = Math.round(e.latlng.lat);
+      var popupContent = 'X: ' + pixelX + ', Y: ' + pixelY;
+
+      var popup = L.popup({ autoClose: false, closeOnClick: false })
+        .setLatLng(e.latlng)
+        .setContent(popupContent)
+        .addTo(map);
+
+      activePopups.push(popup);
+
+      // 5개 초과 시 오래된 팝업 닫기
+      if (activePopups.length > 5) {
+        var oldest = activePopups.shift();
+        map.closePopup(oldest);
+      }
+
+      // 1분 후 자동 닫기
+      setTimeout(() => {
+        map.closePopup(popup);
+        activePopups = activePopups.filter(p => p !== popup);
+      }, 60000);
+    });
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leaflet Excel Marker</title>
+확장
+index-duplication2.html
+4KB
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leaflet Excel Marker</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 100vh;
+    }
+    #pointToggle, #uploadExcel, #labelToggle {
+      position: absolute;
+      top: 200px; /* 위치를 더 위로 조정 */
+      left: 10px;
+      z-index: 1000;
+      background: white;
+      padding: 2px 8px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 12px;
+      line-height: 1.2;
+      margin-bottom: 5px;
+    }
+    #uploadExcel {
+      top: 300px; /* POINT 버튼 아래로 배치 */
+      font-weight: normal;
+    }
+    #labelToggle {
+      top: 250px; /* LABEL 버튼 위치 조정 */
+    }
+  </style>
+</head>
+<body>
+  <div id="pointToggle">POINT</div>
+  <input type="file" id="uploadExcel" accept=".xlsx, .xls" />
+  <div id="labelToggle">LABEL</div>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <script>
+    var imageUrl = 'testmodule.png';
+    var imageWidth = 9000;
+    var imageHeight = 4500;
+    var imageBounds = [[0, 0], [imageHeight, imageWidth]];
+
+    var map = L.map('map', {
+      crs: L.CRS.Simple,
+      minZoom: -2,
+      maxZoom: 4,
+      zoomControl: true,
+      maxBounds: imageBounds,
+      maxBoundsViscosity: 1.0
+    });
+
+    L.imageOverlay(imageUrl, imageBounds, { noWrap: true }).addTo(map);
+    map.fitBounds(imageBounds);
+
+    // 지도에 표시할 데이터와 레이어들을 저장
+    let showAsLabel = false;
+    let uploadedData = [];         // 엑셀 데이터 저장
+    let displayedLayers = [];      // 지도에 추가된 마커/텍스트 저장
+
+    // "POINT" 버튼 기능 추가 (좌표 표시 모드)
+    var pointMode = false;
+    var pointToggleButton = document.getElementById('pointToggle');
+
+    pointToggleButton.addEventListener('click', function() {
+      pointMode = !pointMode;
+      pointToggleButton.style.backgroundColor = pointMode ? '#def' : 'white';
+    });
+
+var activePopups = [];
+
+map.on('click', function (e) {
+  if (!pointMode) return;
+
+  var pixelX = Math.round(e.latlng.lng);
+  var pixelY = Math.round(e.latlng.lat);
+  var popupContent = 'X: ' + pixelX + ', Y: ' + pixelY;
+
+  var popup = L.popup({ autoClose: false, closeOnClick: false })
+    .setLatLng(e.latlng)
+    .setContent(popupContent)
+    .addTo(map);
+
+  activePopups.push(popup);
+
+  // 5개 초과 시 가장 오래된 팝업 닫기
+  if (activePopups.length > 5) {
+    var oldest = activePopups.shift();
+    map.closePopup(oldest);
+  }
+
+  // 1분 후 자동 닫기 + 배열에서 제거
+  setTimeout(() => {
+    map.closePopup(popup);
+    activePopups = activePopups.filter(p => p !== popup);
+  }, 60000);
+});
+
+
+    // 엑셀 파일 업로드 후 데이터 처리
+    document.getElementById('uploadExcel').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(sheet, { header: "A" });
+
+        uploadedData = json;  // 데이터 저장
+        displayedLayers.forEach(layer => map.removeLayer(layer)); // 기존 요소 삭제
+        displayedLayers = [];  // 레이어 초기화
+
+        renderData(json);  // 엑셀 데이터 지도에 표시
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
+
+    // "LABEL" 버튼을 눌렀을 때의 동작
+    document.getElementById('labelToggle').addEventListener('click', function () {
+      showAsLabel = !showAsLabel;
+      this.style.backgroundColor = showAsLabel ? '#def' : 'white';
+
+      // 기존 마커/텍스트 모두 제거
+      displayedLayers.forEach(layer => map.removeLayer(layer));
+      displayedLayers = [];
+
+      // 새로운 표시 방식으로 다시 렌더링
+      renderData(uploadedData);
+    });
+
+    // 지도에 표시하는 함수
+    function renderData(dataArray) {
+  dataArray.forEach(row => {
+    const rawCoord = String(row.B || '').trim();  // 좌표
+    const label = row.C;                          // 마커 팝업 텍스트
+    const rawColor = String(row.D || '').trim();  // 색상 코드 (D열)
+
+    if (rawCoord.length === 8 && !isNaN(rawCoord)) { // 좌표가 8자리 숫자인지 확인
+      const x = parseInt(rawCoord.slice(0, 4)); // X 좌표
+      const y = parseInt(rawCoord.slice(4, 8)); // Y 좌표
+
+      // D열에서 색상 코드 추출, 기본 색상은 파란색 (#0000FF)
+      const markerColor = rawColor ? (rawColor.startsWith('#') ? rawColor : `#${rawColor}`) : '#0000FF';
+
+      let layer;
+      if (showAsLabel) {
+        // LABEL 모드에서는 텍스트로 표시, 텍스트 크기를 작게 설정
+        const textIcon = L.divIcon({
+          className: 'custom-label',
+          html: `<span style="color: ${markerColor}; font-weight: bold; white-space: nowrap; font-size: 10px;">${label}</span>`,
+          iconSize: [label.length * 6, 16], // 텍스트 크기에 따라 아이콘 크기 조정, 크기 작게 설정
+          iconAnchor: [label.length * 3, 8]
+        });
+        layer = L.marker([y, x], { icon: textIcon });
+      } else {
+        // POINT 모드에서는 원형 마커로 표시, 마커 크기를 작게 설정
+        layer = L.circleMarker([y, x], {
+          radius: 6,  // 원 크기 작게 설정
+          fillColor: markerColor,
+          color: markerColor,
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 1
+        }).bindPopup(String(label));
+      }
+
+      layer.addTo(map);
+      displayedLayers.push(layer); // 새로 추가된 레이어를 저장
+    }
+  });
+}
+  </script>
+</body>
+</html>
+index-duplication2.html
+6KB
